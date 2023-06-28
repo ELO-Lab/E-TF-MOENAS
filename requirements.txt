@@ -1,0 +1,6 @@
+pymoo==0.3.0
+fvcore==0.1.5.post20210630
+ConfigSpace
+pathvalidate
+torch==1.8.1
+torchvision==0.9.1
