@@ -57,7 +57,10 @@ def main(kwargs):
     dir_name = f'{kwargs.problem}_{kwargs.algorithm}'
 
     algo_res_path = RES_PATH + '/' + dir_name
-    os.mkdir(algo_res_path)
+    try:
+        os.mkdir(algo_res_path)
+    except FileExistsError:
+        pass
     print(f'--> Create folder {algo_res_path} - Done\n')
 
     random_seeds_list = [init_seed + run * 100 for run in range(n_run)]
@@ -67,7 +70,7 @@ def main(kwargs):
     print(f'******* PROBLEM *******')
     print(f'- Benchmark: {problem.name}')
     print(f'- Dataset: {problem.dataset}')
-    print(f'- Maximum number of evaluations: {problem.maxEvals}')
+    print(f'- Maximum number of evaluations: {problem.max_eval}')
     print(f'- Search:')
     print(f'\t+ The first objective (minimize): {objectives["f0"]}')
     print(f'\t+ The second objective (minimize): {objectives["f1"]}')
@@ -92,7 +95,7 @@ def main(kwargs):
         f.write(f'******* PROBLEM *******\n')
         f.write(f'- Benchmark: {problem.name}\n')
         f.write(f'- Dataset: {problem.dataset}\n')
-        f.write(f'- Maximum number of evaluations: {problem.maxEvals}\n')
+        f.write(f'- Maximum number of evaluations: {problem.max_eval}\n')
         f.write(f'- Search:\n')
         f.write(f'\t+ The first objective (minimize): {objectives["f0"]}\n')
         f.write(f'\t+ The second objective (minimize): {objectives["f1"]}\n')
@@ -136,7 +139,10 @@ def main(kwargs):
             problem.set_zero_cost_predictor(ZC_predictor)
 
         exp_res_path = algo_res_path + '/' + f'{rid}'
-        os.mkdir(exp_res_path)
+        try:
+            os.mkdir(exp_res_path)
+        except FileExistsError:
+            pass
         s = time.time()
 
         algorithm.set_hyperparameters(res_path=exp_res_path)

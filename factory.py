@@ -81,12 +81,12 @@ problem_configuration4algorithm = {
     },
 }
 
-def get_problems(problem_name, **kwargs):
+def get_problems(problem_name, max_eval, **kwargs):
     config = problem_configuration[problem_name]
     if problem_name == 'NAS101':
-        return NASBench101(dataset=config['dataset'], max_eval=kwargs['max_eval'], **kwargs)
+        return NASBench101(dataset=config['dataset'], max_eval=max_eval, **kwargs)
     elif 'NAS201' in problem_name:
-        return NASBench201(dataset=config['dataset'], max_eval=kwargs['max_eval'], **kwargs)
+        return NASBench201(dataset=config['dataset'], max_eval=max_eval, **kwargs)
     else:
         raise ValueError(f'Not supporting this problem - {problem_name}.')
 

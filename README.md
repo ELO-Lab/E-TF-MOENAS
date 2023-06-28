@@ -9,14 +9,14 @@ Ngoc Hoang Luong, Quan Minh Phan, An Vo, Tan Ngoc Pham, Dzung Tri Bui
 ```
 $ pip install -r requirements.txt
 ```
--  Download databases in this [link](https://drive.google.com/drive/folders/1jAX-By0UUOld_vLRLBLX1GppQ6lhcOvS?usp=sharing), unzip and put all folders into ```data``` folder for building APIs (benchmarks).
+-  Download databases in this [link](https://drive.google.com/drive/folders/1jAX-By0UUOld_vLRLBLX1GppQ6lhcOvS?usp=sharing), unzip and put all folders into ```database``` folder for building APIs (benchmarks).
 
 In our experiments, we do not implement directly the API benchmarks published in their repos (i.e., [NAS-Bench-101](https://arxiv.org/abs/1902.09635), [NAS-Bench-201](https://arxiv.org/abs/2001.00326)).
 Instead, we create smaller-size databases by accessing their databases and only logging necessary content.
 
 You can compare our databases and the original databases in [check_log_database.ipynb](check_log_database.ipynb)
 ## Reproducing the results
-You can reproduce our results by running the below script:
+You can re-utilize our results [here](https://drive.google.com/drive/u/1/folders/1EXb8lpizImOn78unVA08FJJxeyjkI8hw) or reproduce them by running the below script:
 ```shell
 $ python main.py --problem [NAS101, NAS201-C10] --algorithm <search-strategy> 
 ```
