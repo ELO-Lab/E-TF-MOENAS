@@ -18,66 +18,66 @@ problem_configuration = {
 problem_configuration4algorithm = {
     # single-training-based search
     'val_error': {
-        '101': {'f0': 'params', 'f1': 'val_error_12'},
-        '201': {'f0': 'FLOPs', 'f1': 'val_error_12'},
+        '101': {'f1': 'val_error_12'},
+        '201': {'f1': 'val_error_12'},
     },
     'train_loss': {
-        '201': {'f0': 'FLOPs', 'f1': 'train_loss_12'}
+        '201': {'f1': 'train_loss_12'}
     },
     'val_loss': {
-        '201': {'f0': 'FLOPs', 'f1': 'val_loss_12'}
+        '201': {'f1': 'val_loss_12'}
     },
     'train_error': {
-        '101': {'f0': 'params', 'f1': 'train_error_12'},
-        '201': {'f0': 'FLOPs', 'f1': 'train_error_12'}
+        '101': {'f1': 'train_error_12'},
+        '201': {'f1': 'train_error_12'}
     },
     'MOENAS_PSI': {
-        '101': {'f0': 'params', 'f1': 'val_error_12'},
-        '201': {'f0': 'FLOPs', 'f1': 'val_error_12'}
+        '101': {'f1': 'val_error_12'},
+        '201': {'f1': 'val_error_12'}
     },
     'MOENAS_TF_PSI': {
-        '101': {'f0': 'params', 'f1': 'val_error_12'},
-        '201': {'f0': 'FLOPs', 'f1': 'val_error_12'}
+        '101': {'f1': 'val_error_12'},
+        '201': {'f1': 'val_error_12'}
     },
     'ENAS_TFI': {
-        '101': {'f0': 'params', 'f1': 'val_error_12'},
-        '201': {'f0': 'FLOPs', 'f1': 'val_error_12'}
+        '101': {'f1': 'val_error_12'},
+        '201': {'f1': 'val_error_12'}
     },
 
     # single-training-free search
     'synflow': {
-        '101': {'f0': 'params', 'f1': '-synflow'},
-        '201': {'f0': 'FLOPs', 'f1': '-synflow'}
+        '101': {'f1': '-synflow'},
+        '201': {'f1': '-synflow'}
     },
     'jacov': {
-        '101': {'f0': 'params', 'f1': '-jacov'},
-        '201': {'f0': 'FLOPs', 'f1': '-jacov'}
+        '101': {'f1': '-jacov'},
+        '201': {'f1': '-jacov'}
     },
     'snip': {
-        '101': {'f0': 'params', 'f1': '-snip'},
-        '201': {'f0': 'FLOPs', 'f1': '-snip'}
+        '101': {'f1': '-snip'},
+        '201': {'f1': '-snip'}
     },
     'grasp': {
-        '101': {'f0': 'params', 'f1': '-grasp'},
-        '201': {'f0': 'FLOPs', 'f1': '-grasp'}
+        '101': {'f1': '-grasp'},
+        '201': {'f1': '-grasp'}
     },
     'grad_norm': {
-        '101': {'f0': 'params', 'f1': '-grad_norm'},
-        '201': {'f0': 'FLOPs', 'f1': '-grad_norm'}
+        '101': {'f1': '-grad_norm'},
+        '201': {'f1': '-grad_norm'}
     },
     'fisher': {
-        '101': {'f0': 'params', 'f1': '-fisher'},
-        '201': {'f0': 'FLOPs', 'f1': '-fisher'}
+        '101': {'f1': '-fisher'},
+        '201': {'f1': '-fisher'}
     },
 
     # multi-training-free search
-    'E_TF_MOENAS': {
-        '101': {'f0': 'params', 'f1': ['-synflow', '-jacov']},
-        '201': {'f0': 'FLOPs', 'f1': ['-synflow', '-jacov']}
+    'E-TF-MOENAS': {
+        '101': {'f1': ['-synflow', '-jacov']},
+        '201': {'f1': ['-synflow', '-jacov']}
     },
-    'E_TF_MOENAS_C': {
-        '101': {'f0': 'params', 'f1': ['-synflow', '-jacov']},
-        '201': {'f0': 'FLOPs', 'f1': ['-synflow', '-jacov']}
+    'E-TF-MOENAS-C': {
+        '101': {'f1': ['-synflow', '-jacov']},
+        '201': {'f1': ['-synflow', '-jacov']}
     },
 }
 

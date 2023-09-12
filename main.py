@@ -19,8 +19,9 @@ def main(kwargs):
     RES_PATH = f'{kwargs.res_path}/{kwargs.problem}'
 
     ''' ============================================== Set up problem ============================================== '''
-    database_path = './database'
-    problem = get_problems(problem_name=kwargs.problem, database_path=database_path, max_eval=kwargs.max_eval)
+    f0 = kwargs.f0
+    database_path = '/content/drive/MyDrive/QuanPM/Benchmark_Data'
+    problem = get_problems(problem_name=kwargs.problem, database_path=database_path, max_eval=kwargs.max_eval, f0=f0)
     problem.set_up()
 
     ''' ==================================================================================================== '''
@@ -50,7 +51,7 @@ def main(kwargs):
                                   mutation=mutation,
                                   survival=survival,
                                   debug=bool(kwargs.debug),
-                                  f0=objectives['f0'],
+                                  f0=f0,
                                   f1=objectives['f1'])
 
     ''' ==================================== Set up experimental environment ======================================= '''
@@ -159,6 +160,8 @@ if __name__ == '__main__':
     ''' PROBLEM '''
     parser.add_argument('--problem', type=str, default='NAS201-C10', help='the problem name',
                         choices=['NAS101', 'NAS201-C10', 'NAS201-C100', 'NAS201-IN16'])
+    parser.add_argument('--f0', type=str, default='flops', help='the first objective',
+                        choices=['flops, params, latency'])
 
     ''' EVOLUTIONARY ALGORITHM '''
     parser.add_argument('--pop_size', type=int, default=20, help='the population size')
