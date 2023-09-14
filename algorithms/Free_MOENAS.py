@@ -24,11 +24,10 @@ class Free_NSGAII(NSGAII):
 
         indicator_time = 0.0
 
-        log_synflow, cost = self.problem.get_free_metric(arch, 'logsynflow')
+        log_synflow, cost = self.problem.get_free_metrics(arch, 'log_synflow')
         indicator_time += cost
-        nwot, cost = self.problem.get_free_metric(arch, 'nwot')
+        nwot, cost = self.problem.get_free_metrics(arch, 'nwot')
         indicator_time += cost
-
         skip = self.problem.get_skip(arch)
         comp_metric = self.problem.get_computational_metric(arch=arch, metric=self.f0)
 
@@ -56,7 +55,7 @@ class Free_NSGAII(NSGAII):
             F_pop[i][0] = F[0]
             all_free_metrics.append(F[1:])
         all_free_metrics = np.array(all_free_metrics)
-        max_values = np.max(all_free_metrics, axis=0) + 1e-9
+        max_values = np.max(np.abs(all_free_metrics), axis=0) + 1e-9
         all_free_metrics /= max_values
         sum_free_metrics = np.sum(all_free_metrics, axis=1)
         F_pop[:, 1] = -sum_free_metrics
@@ -81,7 +80,7 @@ class Free_NSGAII(NSGAII):
             F_off[i][0] = F[0]
             all_free_metrics.append(F[1:])
         all_free_metrics = np.array(all_free_metrics)
-        max_values = np.max(all_free_metrics, axis=0) + 1e-9
+        max_values = np.max(np.abs(all_free_metrics), axis=0) + 1e-9
         all_free_metrics /= max_values
         sum_free_metrics = np.sum(all_free_metrics, axis=1)
         F_off[:, 1] = -sum_free_metrics

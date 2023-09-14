@@ -247,8 +247,7 @@ class NASBench201(Problem):
             dataset_ = self.dataset
         info = self.logsynflow_nwot[dataset_][idx][metric]
         score, indicator_time = info['score'], info['time']
-        benchmark_time = 0.0
-        return score, benchmark_time, indicator_time
+        return score, indicator_time
 
     @staticmethod
     def get_skip(arch):

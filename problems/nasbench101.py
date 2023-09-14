@@ -68,6 +68,7 @@ class NASBench101(Problem):
 
         self.flop_database = p.load(open(f'{self.database_path}/flops_all_arch_101.p', 'rb'))
         self.zc_benchmark = p.load(open(f'{self.database_path}/zc_101.p', 'rb'))
+        self.logsynflow_nwot_skip = p.load(open(f'{self.database_path}/logsynflow_nwot_skip.p', 'rb'))
         print('--> Set Up - Done')
 
     def X2matrices(self, X):
@@ -214,6 +215,22 @@ class NASBench101(Problem):
         #         self.D[key]['tfi'] = score
         #         self.D[key]['indicator_time'] = indicator_time
         return score, benchmark_time, indicator_time
+
+    def get_free_metrics(self, arch, metric):
+        # Following the paper:
+        # FreeREA: Training-Free Evolution-Based Architecture Search
+        h = self.get_key_in_data(arch)
+        info = self.logsynflow_nwot_skip[h][metric]
+        score, indicator_time = info['score'], info['time']
+        return score, indicator_time
+
+    def get_skip(self, arch):
+        # Following the paper:
+        # FreeREA: Training-Free Evolution-Based Architecture Search
+        h = self.get_key_in_data(arch)
+        info = self.logsynflow_nwot_skip[h]['skip']
+        score, indicator_time = info['score'], info['time']
+        return score, indicator_time
 
     def _get_performance_metric(self, arch, epoch, metric='error', subset='val'):
         """
