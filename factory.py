@@ -43,6 +43,10 @@ problem_configuration4algorithm = {
         '101': {'f1': 'val_error_12'},
         '201': {'f1': 'val_error_12'}
     },
+    'Free_EMONAS': {
+        '101': {'f1': 'logsynflow + nwot + skip'},
+        '201': {'f1': 'logsynflow + nwot + skip'}
+    },
 
     # single-training-free search
     'synflow': {
@@ -119,6 +123,9 @@ def get_algorithm(algorithm_name, **kwargs):
         from algorithms import ENAS_TFI
         return ENAS_TFI(name=algorithm_name, path_pre_pop='./pre_pop')
 
+    elif algorithm_name == 'Free_EMONAS':
+        from algorithms import Free_NSGAII
+        return Free_NSGAII(name=algorithm_name)
     else:
         raise ValueError(f'Not supporting this algorithm - {algorithm_name}.')
 

@@ -169,7 +169,7 @@ if __name__ == '__main__':
                         choices=['val_error', 'val_loss', 'train_loss',
                                  'synflow', 'jacov', 'snip', 'grad_norm', 'grasp', 'fisher',
                                  'E-TF-MOENAS', 'E-TF-MOENAS-C',
-                                 'MOENAS_PSI', 'MOENAS_TF_PSI', 'ENAS_TFI'])
+                                 'MOENAS_PSI', 'MOENAS_TF_PSI', 'ENAS_TFI', 'Free_EMONAS'])
 
     ''' ENVIRONMENT '''
     parser.add_argument('--n_run', type=int, default=31, help='number of experiment runs')
