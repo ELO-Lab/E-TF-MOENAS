@@ -1,3 +1,4 @@
+from re import M
 import time
 import numpy as np
 import pickle as p
@@ -5,12 +6,21 @@ from problems import Problem
 from zero_cost_methods import modify_input_for_fitting
 
 from nasbench import wrap_api as api
-
 """
 0: CONV 1x1
 1: CONV 3x3
 2: MAXPOOL 3x3
 """
+
+time_dict = {
+    'synflow': 1.4356617034300945,
+    'grad_norm': 2.035946015246093,
+    'grasp': 5.570546795804546,
+    'jacob_cov': 2.5207841626097856,
+    'snip': 2.028758352457235,
+    'fisher': 2.610283957422675
+}
+
 class NASBench101(Problem):
     def __init__(self, max_eval, dataset='CIFAR-10', **kwargs):
         """
@@ -31,8 +41,10 @@ class NASBench101(Problem):
 
         super().__init__(max_eval, 'NASBench101', dataset, **kwargs)
 
-        self.objective_0 = 'nParams'
+        self.objective_0 = kwargs['f0']
         self.objective_1 = 'test_error'
+
+        assert self.objective_0 in ['params', 'flops'], ValueError(f'Wrong objective: {self.objective_0}')
 
         self.OPS = [2, 3, 4]
         self.IDX_OPS = [1, 3, 6, 10, 15]
@@ -47,7 +59,6 @@ class NASBench101(Problem):
         self.data = None
         self.min_max = None
 
-        self.pareto_front_testing = None
         self.zc_predictor = None
 
     def _set_up(self):
@@ -55,10 +66,8 @@ class NASBench101(Problem):
         self.data = p.load(f_data)
         f_data.close()
 
-        f_pareto_front_testing = open(f'{self.database_path}/pareto_front(testing).p', 'rb')
-        self.pareto_front_testing = p.load(f_pareto_front_testing)
-        f_pareto_front_testing.close()
-
+        self.flop_database = p.load(open(f'{self.database_path}/flops_all_arch_101.p', 'rb'))
+        self.zc_benchmark = p.load(open(f'{self.database_path}/zc_101.p', 'rb'))
         print('--> Set Up - Done')
 
     def X2matrices(self, X):
@@ -172,25 +181,38 @@ class NASBench101(Problem):
         return np.round(1 - accuracy, 4), benchmark_time, indicator_time
 
     def get_tfi(self, arch):
-        benchmark_time = 0.0
-        key = self.get_key_in_data(arch)
-        if key not in self.D.keys():
-            s = time.time()
-            X_modified = modify_input_for_fitting(arch, self.name)
-            score = self.zc_predictor.query_(arch=X_modified)
-            indicator_time = time.time() - s
-            self.D[key] = {'tfi': score, 'indicator_time': indicator_time}
+        benchmark_time, indicator_time = 0.0, 0.0
+        h = self.get_key_in_data(arch)
+
+        score = {}
+        metric = self.zc_predictor.method_type
+        if isinstance(metric, list):
+            for m in metric:
+                m_ = 'jacob_cov' if m == 'jacov' else m
+                score[m] = self.zc_benchmark[h][m_]
+                indicator_time += time_dict[m_]
         else:
-            try:
-                score = self.D[key]['tfi']
-                indicator_time = self.D[key]['indicator_time']
-            except KeyError:
-                s = time.time()
-                X_modified = modify_input_for_fitting(arch, self.name)
-                score = self.zc_predictor.query_(arch=X_modified)
-                indicator_time = time.time() - s
-                self.D[key]['tfi'] = score
-                self.D[key]['indicator_time'] = indicator_time
+            m_ = 'jacob_cov' if metric == 'jacov' else metric
+            score = {metric: self.zc_benchmark[h][m_]}
+            indicator_time = time_dict[m_]
+
+        # if key not in self.D.keys():
+        #     s = time.time()
+        #     X_modified = modify_input_for_fitting(arch, self.name)
+        #     score = self.zc_predictor.query_(arch=X_modified)
+        #     indicator_time = time.time() - s
+        #     self.D[key] = {'tfi': score, 'indicator_time': indicator_time}
+        # else:
+        #     try:
+        #         score = self.D[key]['tfi']
+        #         indicator_time = self.D[key]['indicator_time']
+        #     except KeyError:
+        #         s = time.time()
+        #         X_modified = modify_input_for_fitting(arch, self.name)
+        #         score = self.zc_predictor.query_(arch=X_modified)
+        #         indicator_time = time.time() - s
+        #         self.D[key]['tfi'] = score
+        #         self.D[key]['indicator_time'] = indicator_time
         return score, benchmark_time, indicator_time
 
     def _get_performance_metric(self, arch, epoch, metric='error', subset='val'):
@@ -212,8 +234,8 @@ class NASBench101(Problem):
             if 'negative' in metric:  # in case we want to replace the error rate
                 if len(list_perf_metric) > 1:  # return a dict
                     perf_metric = {}
-                    for metric in list_perf_metric:
-                        perf_metric[metric] = -list_perf_metric[metric]
+                    for m in list_perf_metric:
+                        perf_metric[m] = -list_perf_metric[m]
                 else:  # return a single value (not a dict)
                     for metric in list_perf_metric.keys():
                         perf_metric = -list_perf_metric[metric]
@@ -223,7 +245,8 @@ class NASBench101(Problem):
 
     """--------------------------------------------- Computational Metrics ------------------------------------------"""
     def get_FLOPs(self, arch):
-        pass
+        h = self.get_key_in_data(arch)
+        return self.flop_database[h]
 
     def get_params(self, arch):
         """
@@ -238,7 +261,7 @@ class NASBench101(Problem):
         - In NAS-Bench-201 problem, the computational metric can be one of following metrics: {nFLOPs, #params}
         """
         assert metric is not None
-        if metric == 'FLOPs':
+        if metric == 'flops':
             return self.get_FLOPs(arch)
         elif metric == 'params':
             return self.get_params(arch)

@@ -10,13 +10,9 @@ def get_population_X(tmp_P, pop_size, problem, tf_calculator):
     tmp_P_F = []
 
     for i in range(len(tmp_P)):
-        X_modified = modify_input_for_fitting(tmp_P[i].X, problem.name)
-
-        score = tf_calculator.query_(arch=X_modified)
-        computational_metric = problem.get_computational_metric(tmp_P[i].X)
-
-        tmp_P_F.append([computational_metric, -score])
-
+        comp_metric, perf_metric, _, _ = problem.evaluate(arch=tmp_P[i].X, comp_metric=problem.objective_0,
+        perf_metric='negative_tfi', epoch=None, subset=None)
+        tmp_P_F.append([comp_metric, perf_metric])
     tmp_P_F = np.array(tmp_P_F)
     P_X = get_k_best_solutions(tmp_P=tmp_P, tmp_P_F=tmp_P_F, k=pop_size)
     return P_X
@@ -53,19 +49,19 @@ class ENAS_TFI(NSGAII):
         self.sampling.n_sample = self.n_sample
         if self.problem.name == 'NASBench101':
             self.pop_size = 100
-        try:
-            P_X = p.load(
-                open(self.path_pre_pop + '/' + f'{self.problem.name}_{self.problem.dataset}_'
-                                       f'population_synflow_'
-                                       f'{self.sampling.n_sample}_{self.seed}.p', 'rb')
-            )
-        except FileNotFoundError:
-            tmp_P = self.sampling.do(self.problem)
-            P_X = get_population_X(tmp_P=tmp_P, pop_size=self.pop_size,
-                                   problem=self.problem, tf_calculator=self.tf_calculator)
-            p.dump(P_X, open(self.path_pre_pop + '/' + f'{self.problem.name}_{self.problem.dataset}_'
-                                                       f'population_synflow_'
-                                                       f'{self.sampling.n_sample}_{self.seed}.p', 'wb'))
+        # try:
+        #     P_X = p.load(
+        #         open(self.path_pre_pop + '/' + f'{self.problem.name}_{self.problem.dataset}_'
+        #                                f'population_synflow_'
+        #                                f'{self.sampling.n_sample}_{self.seed}.p', 'rb')
+        #     )
+        # except FileNotFoundError:
+        tmp_P = self.sampling.do(self.problem)
+        P_X = get_population_X(tmp_P=tmp_P, pop_size=self.pop_size,
+                                problem=self.problem, tf_calculator=self.tf_calculator)
+        # p.dump(P_X, open(self.path_pre_pop + '/' + f'{self.problem.name}_{self.problem.dataset}_'
+        #                                             f'population_synflow_'
+        #                                             f'{self.sampling.n_sample}_{self.seed}.p', 'wb'))
         P = Population(self.pop_size)
         for i, X in enumerate(P_X):
             hashKey = get_hashKey(X, problem_name=self.problem.name)

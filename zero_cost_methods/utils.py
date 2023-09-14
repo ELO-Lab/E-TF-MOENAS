@@ -47,7 +47,7 @@ def get_zero_cost_predictor(config, method_type):
         else:
             raise ValueError(
                 f'Just supported "grad_norm"; "grasp"; "jacob"; "snip"; and "synflow", not {method_type}.')
-    predictor.pre_process()
+    # predictor.pre_process()
     return predictor
 
 def modify_input_for_fitting(X, problem_name):

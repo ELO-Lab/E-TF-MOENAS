@@ -59,7 +59,7 @@ In our study, we evaluate the transferability of algorithms by evaluating the fo
 Source code for transferability evaluation can be found [here](transferability_evaluation.ipynb).
 
 ## Visualization and T-test
-Source code for transferability evaluation can be found [here](visualization101.ipynb) (for NAS-Bench-101) and [here](visualization201.ipynb) (for NAS-Bench-201).
+Source code for results visualization can be found [here](visualization101.ipynb) (for NAS-Bench-101) and [here](visualization201.ipynb) (for NAS-Bench-201).
 
 ## Acknowledgement
 Our source code is inspired by:

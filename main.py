@@ -73,7 +73,7 @@ def main(kwargs):
     print(f'- Dataset: {problem.dataset}')
     print(f'- Maximum number of evaluations: {problem.max_eval}')
     print(f'- Search:')
-    print(f'\t+ The first objective (minimize): {objectives["f0"]}')
+    print(f'\t+ The first objective (minimize): {problem.objective_0}')
     print(f'\t+ The second objective (minimize): {objectives["f1"]}')
     print(f'- Evaluate:')
     print(f'\t+ The first objective (minimize): {problem.objective_0}')
@@ -98,7 +98,7 @@ def main(kwargs):
         f.write(f'- Dataset: {problem.dataset}\n')
         f.write(f'- Maximum number of evaluations: {problem.max_eval}\n')
         f.write(f'- Search:\n')
-        f.write(f'\t+ The first objective (minimize): {objectives["f0"]}\n')
+        f.write(f'\t+ The first objective (minimize): {problem.objective_0}\n')
         f.write(f'\t+ The second objective (minimize): {objectives["f1"]}\n')
         f.write(f'- Evaluate:\n')
         f.write(f'\t+ The first objective (minimize): {problem.objective_0}\n')
@@ -135,8 +135,8 @@ def main(kwargs):
                 ZC_predictor = get_zero_cost_predictor(config=config, method_type='synflow')
             else:
                 ZC_predictor = get_zero_cost_predictor(config=config, method_type=kwargs.algorithm)
-            if kwargs.algorithm == 'ENAS_TFI':
-                algorithm.tf_calculator = ZC_predictor
+            # if kwargs.algorithm == 'ENAS_TFI':
+            #     algorithm.tf_calculator = ZC_predictor
             problem.set_zero_cost_predictor(ZC_predictor)
 
         exp_res_path = algo_res_path + '/' + f'{rid}'
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     parser.add_argument('--problem', type=str, default='NAS201-C10', help='the problem name',
                         choices=['NAS101', 'NAS201-C10', 'NAS201-C100', 'NAS201-IN16'])
     parser.add_argument('--f0', type=str, default='flops', help='the first objective',
-                        choices=['flops, params, latency'])
+                        choices=['flops', 'params', 'latency'])
 
     ''' EVOLUTIONARY ALGORITHM '''
     parser.add_argument('--pop_size', type=int, default=20, help='the population size')

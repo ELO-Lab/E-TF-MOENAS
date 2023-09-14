@@ -4,6 +4,34 @@ import pickle as p
 from problems import Problem
 from zero_cost_methods import modify_input_for_fitting
 
+OP_NAMES_NB201 = ['skip_connect', 'none', 'nor_conv_3x3', 'nor_conv_1x1', 'avg_pool_3x3']
+EDGE_LIST = ((1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4))
+available_ops = [0, 1, 2, 3, 4]
+
+def encode_int_list_2_ori_input(int_list):
+    list_ops = np.array(['none', 'skip_connect', 'nor_conv_1x1', 'nor_conv_3x3', 'avg_pool_3x3'])
+    list_int_ops = np.array(int_list)
+    list_str_ops = list_ops[list_int_ops]
+    return '|{}~0|+|{}~0|{}~1|+|{}~0|{}~1|{}~2|'.format(*list_str_ops)
+
+def convert_str_to_op_indices(str_encoding):
+    """
+    Converts NB201 string representation to op_indices
+    """
+    nodes = str_encoding.split('+')
+
+    def get_op(x):
+        return x.split('~')[0]
+
+    node_ops = [list(map(get_op, n.strip()[1:-1].split('|'))) for n in nodes]
+
+    enc = []
+    for u, v in EDGE_LIST:
+        enc.append(OP_NAMES_NB201.index(node_ops[v - 2][u - 1]))
+
+    return tuple(enc)
+
+
 def get_key_in_data(arch):
     """
     Get the key which is used to represent the architecture in "self.data".
@@ -29,8 +57,10 @@ class NASBench201(Problem):
 
         super().__init__(max_eval, 'NASBench201', dataset, **kwargs)
 
-        self.objective_0 = 'FLOPs'
+        self.objective_0 = kwargs['f0']
         self.objective_1 = 'test_error'
+
+        assert self.objective_0 in ['params', 'flops', 'latency'], ValueError(f'Wrong objective: {self.objective_0}')
 
         # 'none': 0
         # 'skip_connect': 1
@@ -44,7 +74,6 @@ class NASBench201(Problem):
         self.data = None
         self.min_max = None
 
-        self.pareto_front_testing = None
         self.zc_predictor = None
 
     def _set_up(self):
@@ -57,10 +86,8 @@ class NASBench201(Problem):
         self.data = p.load(f_data)
         f_data.close()
 
-        f_pareto_front_testing = open(f'{self.database_path}/[{self.dataset}]_pareto_front(testing).p', 'rb')
-        self.pareto_front_testing = p.load(f_pareto_front_testing)
-        self.pareto_front_testing[:, 0] = np.round(self.pareto_front_testing[:, 0]/1e3, 4)
-        f_pareto_front_testing.close()
+        import json
+        self.zc_benchmark = json.load(open(f'/content/drive/MyDrive/QuanPM/GECCO_2024/zc_nasbench201.json'))
 
         print('--> Set Up - Done')
 
@@ -137,24 +164,37 @@ class NASBench201(Problem):
 
     def get_tfi(self, arch):
         benchmark_time = 0.0
-        key = get_key_in_data(arch)
-        if key not in self.D.keys():
-            s = time.time()
-            X_modified = modify_input_for_fitting(arch, self.name)
-            score = self.zc_predictor.query_(arch=X_modified)
-            indicator_time = time.time() - s
-            self.D[key] = {'tfi': score, 'indicator_time': indicator_time}
+        # key = get_key_in_data(arch)
+        # if key not in self.D.keys():
+        #     s = time.time()
+        #     X_modified = modify_input_for_fitting(arch, self.name)
+        #     score = self.zc_predictor.query_(arch=X_modified)
+        #     indicator_time = time.time() - s
+        #     self.D[key] = {'tfi': score, 'indicator_time': indicator_time}
+        # else:
+        #     try:
+        #         score = self.D[key]['tfi']
+        #         indicator_time = self.D[key]['indicator_time']
+        #     except KeyError:
+        #         s = time.time()
+        #         X_modified = modify_input_for_fitting(arch, self.name)
+        #         score = self.zc_predictor.query_(arch=X_modified)
+        #         indicator_time = time.time() - s
+        #         self.D[key]['tfi'] = score
+        #         self.D[key]['indicator_time'] = indicator_time
+        str_input = encode_int_list_2_ori_input(arch)
+        op_indices = str(convert_str_to_op_indices(str_input))
+        metric = self.zc_predictor.method_type
+        score = {}
+        indicator_time = 0.0
+        if isinstance(metric, list):
+            for m in metric:
+                score[m] = self.zc_benchmark['cifar10'][op_indices][m]['score']
+                indicator_time += self.zc_benchmark['cifar10'][op_indices][m]['time']
         else:
-            try:
-                score = self.D[key]['tfi']
-                indicator_time = self.D[key]['indicator_time']
-            except KeyError:
-                s = time.time()
-                X_modified = modify_input_for_fitting(arch, self.name)
-                score = self.zc_predictor.query_(arch=X_modified)
-                indicator_time = time.time() - s
-                self.D[key]['tfi'] = score
-                self.D[key]['indicator_time'] = indicator_time
+            score = {metric: self.zc_benchmark['cifar10'][op_indices][metric]['score']}
+            indicator_time = self.zc_benchmark['cifar10'][op_indices][metric]['time']
+        # score, indicator_time = {metric: self.zc_benchmark['cifar10'][op_indices][metric]['score']}, self.zc_benchmark['cifar10'][op_indices][metric]['time']
         return score, benchmark_time, indicator_time
 
     def get_loss(self, arch, epoch, subset):
@@ -191,6 +231,20 @@ class NASBench201(Problem):
                     raise ValueError()
         benchmark_time = self.get_cost_time(arch, epoch)
         return np.round(loss, 4), benchmark_time, indicator_time
+
+    def get_free_metrics(self, arch, metric):
+        # Following the paper:
+        # FreeREA: Training-Free Evolution-Based Architecture Search
+        key = get_key_in_data(arch)
+        idx = self.data['200'][key]['idx']
+        if metric == 'log_synflow':
+            score, indicator_time = self.logsynflow_data[idx][0], self.logsynflow_data[idx][1]
+        elif metric == 'nwot':
+            score, indicator_time = self.nwot_data[idx][0], self.nwot_data[idx][1]
+        else:
+            score, indicator_time = self.skip_data[idx][0], self.skip_data[idx][1]
+        benchmark_time = 0.0
+        return score, benchmark_time, indicator_time
 
     def _get_performance_metric(self, arch, epoch, metric='error', subset='val'):
         """
@@ -242,10 +296,14 @@ class NASBench201(Problem):
         - In NAS-Bench-201 problem, the computational metric can be one of following metrics: {nFLOPs, #params}
         """
         assert metric is not None
-        if metric == 'FLOPs':
+        if metric == 'flops':
             return self.get_FLOPs(arch)
         elif metric == 'params':
             return self.get_params(arch)
+        elif metric == 'latency':
+            key = get_key_in_data(arch)
+            latency = self.data['200'][key]['latency']
+            return latency
         else:
             raise ValueError(f'{metric}')
 
