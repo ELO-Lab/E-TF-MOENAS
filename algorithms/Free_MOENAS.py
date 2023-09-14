@@ -23,12 +23,13 @@ class Free_NSGAII(NSGAII):
                         self.finish_executed_time_algorithm - self.start_executed_time_algorithm))
 
         indicator_time = 0.0
-        log_synflow, cost = self.problem.get_free_metric(arch, 'log_synflow')
+
+        log_synflow, cost = self.problem.get_free_metric(arch, 'logsynflow')
         indicator_time += cost
         nwot, cost = self.problem.get_free_metric(arch, 'nwot')
         indicator_time += cost
-        skip, cost = self.problem.get_free_metric(arch, 'skip')
-        indicator_time += cost
+
+        skip = self.problem.get_skip(arch)
         comp_metric = self.problem.get_computational_metric(arch=arch, metric=self.f0)
 
         self.n_eval += 1

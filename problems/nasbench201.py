@@ -87,7 +87,9 @@ class NASBench201(Problem):
         f_data.close()
 
         import json
-        self.zc_benchmark = json.load(open(f'/content/drive/MyDrive/QuanPM/GECCO_2024/zc_nasbench201.json'))
+        self.zc_benchmark = json.load(open(self.database_path + '/zc_nasbench201.json'))
+
+        self.logsynflow_nwot = p.load(open(self.database_path + '/logsynflow_nwot.p', 'rb'))
 
         print('--> Set Up - Done')
 
@@ -237,14 +239,36 @@ class NASBench201(Problem):
         # FreeREA: Training-Free Evolution-Based Architecture Search
         key = get_key_in_data(arch)
         idx = self.data['200'][key]['idx']
-        if metric == 'log_synflow':
-            score, indicator_time = self.logsynflow_data[idx][0], self.logsynflow_data[idx][1]
-        elif metric == 'nwot':
-            score, indicator_time = self.nwot_data[idx][0], self.nwot_data[idx][1]
+        if self.dataset == 'CIFAR-10':
+            dataset_ = 'cifar10'
+        elif self.dataset == 'CIFAR-100':
+            dataset_ = 'cifar100'
         else:
-            score, indicator_time = self.skip_data[idx][0], self.skip_data[idx][1]
+            dataset_ = self.dataset
+        info = self.logsynflow_nwot[dataset_][idx][metric]
+        score, indicator_time = info['score'], info['time']
         benchmark_time = 0.0
         return score, benchmark_time, indicator_time
+
+    @staticmethod
+    def get_skip(arch):
+        genotype = encode_int_list_2_ori_input(arch)
+        levels = genotype.split('+')
+        max_len = 0
+        counter = 0
+
+        for idx, level in enumerate(levels):
+            level = level.split('|')[1:-1]
+            n_genes = len(level)
+
+            for i in range(n_genes):
+                if 'skip' in level[i]:
+                    counter += 1
+                    min_edge = idx - i
+                    max_len += min_edge
+        if counter:
+            return max_len / counter
+        return 0
 
     def _get_performance_metric(self, arch, epoch, metric='error', subset='val'):
         """
