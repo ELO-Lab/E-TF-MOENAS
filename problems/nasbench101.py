@@ -229,8 +229,8 @@ class NASBench101(Problem):
         # FreeREA: Training-Free Evolution-Based Architecture Search
         h = self.get_key_in_data(arch)
         info = self.logsynflow_nwot_skip[h]['skip']
-        score, indicator_time = info['score'], info['time']
-        return score, indicator_time
+        score = info['score']
+        return score
 
     def _get_performance_metric(self, arch, epoch, metric='error', subset='val'):
         """
