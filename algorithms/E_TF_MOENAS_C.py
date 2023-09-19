@@ -4,7 +4,7 @@ from algorithms import NSGAII
 
 class E_TF_NSGAII_C(NSGAII):
     """
-    Enhancing Training-free NSGA-II with n-training-free objectives {FLOPs, Synflow, Jacov, etc} (n >= 2)
+    synflow + jacov
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

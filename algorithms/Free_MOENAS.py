@@ -4,7 +4,7 @@ import numpy as np
 
 class Free_NSGAII(NSGAII):
     """
-    Training-free NSGA-II (only using 1 single training-free performance metrics)
+    logSynflow + jacov + skip
     """
 
     def __init__(self, **kwargs):

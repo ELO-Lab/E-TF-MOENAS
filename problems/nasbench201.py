@@ -237,6 +237,9 @@ class NASBench201(Problem):
     def get_free_metrics(self, arch, metric):
         # Following the paper:
         # FreeREA: Training-Free Evolution-Based Architecture Search
+        str_input = encode_int_list_2_ori_input(arch)
+        op_indices = str(convert_str_to_op_indices(str_input))
+
         key = get_key_in_data(arch)
         idx = self.data['200'][key]['idx']
         if self.dataset == 'CIFAR-10':
@@ -246,7 +249,13 @@ class NASBench201(Problem):
         else:
             dataset_ = self.dataset
         info = self.logsynflow_nwot[dataset_][idx][metric]
-        score, indicator_time = info['score'], info['time']
+        score = info['score']
+        if 'synflow' in metric:
+            indicator_time = self.zc_benchmark['cifar10'][op_indices]['synflow']['time']
+        elif metric == 'nwot':
+            indicator_time = self.zc_benchmark['cifar10'][op_indices]['jacov']['time']
+        else:
+            raise ValueError
         return score, indicator_time
 
     @staticmethod

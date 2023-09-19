@@ -221,7 +221,13 @@ class NASBench101(Problem):
         # FreeREA: Training-Free Evolution-Based Architecture Search
         h = self.get_key_in_data(arch)
         info = self.logsynflow_nwot_skip[h][metric]
-        score, indicator_time = info['score'], info['time']
+        score = info['score']
+        if 'synflow' in metric:
+            indicator_time = time_dict['synflow']
+        elif 'nwot' == metric:
+            indicator_time = time_dict['jacob_cov']
+        else:
+            raise ValueError
         return score, indicator_time
 
     def get_skip(self, arch):

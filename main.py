@@ -20,7 +20,7 @@ def main(kwargs):
 
     ''' ============================================== Set up problem ============================================== '''
     f0 = kwargs.f0
-    database_path = '/content/drive/MyDrive/QuanPM/Benchmark_Data'
+    database_path = './database'
     problem = get_problems(problem_name=kwargs.problem, database_path=database_path, max_eval=kwargs.max_eval, f0=f0)
     problem.set_up()
 
