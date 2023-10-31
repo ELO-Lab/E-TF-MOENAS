@@ -135,8 +135,6 @@ def main(kwargs):
                 ZC_predictor = get_zero_cost_predictor(config=config, method_type='synflow')
             else:
                 ZC_predictor = get_zero_cost_predictor(config=config, method_type=kwargs.algorithm)
-            # if kwargs.algorithm == 'ENAS_TFI':
-            #     algorithm.tf_calculator = ZC_predictor
             problem.set_zero_cost_predictor(ZC_predictor)
 
         exp_res_path = algo_res_path + '/' + f'{rid}'
