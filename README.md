@@ -13,7 +13,7 @@ $ bash install.sh
 In our experiments, we do not use directly the API benchmarks published in their repos (i.e., [NAS-Bench-101](https://arxiv.org/abs/1902.09635), [NAS-Bench-201](https://arxiv.org/abs/2001.00326)).
 Instead, we access their databases and only logging necessary information to create smaller-size databases.
  
-You can compare our databases and the original databases in [check_log_database.ipynb](check_log_database.ipynb)
+You can compare our databases and the original databases in [check_log_database.ipynb](notebooks/check_log_database.ipynb)
 ## Reproducing the results
 You can reproduce the results in our article by running the below script:
 ```shell
@@ -63,10 +63,13 @@ Moreover, you can search with different hyperparameter settings.
 ## Transferability Evaluation (for NAS-Bench-201 only)
 We evaluate the transferability of algorithms by evaluating the found architectures (search on CIFAR-10) on CIFAR-100 and ImageNet16-120 in our article.
 
-Source code for transferability evaluation can be found [here](transferability_evaluation.ipynb).
+Source code for transferability evaluation can be found [here](notebooks/transferability_evaluation.ipynb).
 
 ## Visualization and T-test
-Source code for results visualization can be found [here](visualization101.ipynb) (for NAS-Bench-101) and [here](visualization201.ipynb) (for NAS-Bench-201).
+Source code for results visualization can be found [here](notebooks/visualization101.ipynb) (for NAS-Bench-101) and [here](notebooks/visualization201.ipynb) (for NAS-Bench-201).
+
+## Supplementary Material
+The Supplementary can be found [here](docs/Supplementary.pdf)
 
 ## Acknowledgement
 Our source code is inspired by:
