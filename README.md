@@ -79,6 +79,6 @@ Our source code is inspired by:
 ## Citation
 If you use our source code, please cite our work as:
 ``` 
-N.H. Luong, Q.M. Phan, A. Vo et al., Lightweight multi-objective evolutionary neural architecture search with low-cost proxy metrics,
+N.H. Luong, Q.M. Phan, A. Vo, T.N. Pham, and D.T. Bui, Lightweight multi-objective evolutionary neural architecture search with low-cost proxy metrics,
 Information Sciences, https://doi.org/10.1016/j.ins.2023.119856
 ```
