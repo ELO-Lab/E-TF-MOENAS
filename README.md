@@ -75,3 +75,10 @@ The Supplementary can be found [here](docs/Supplementary.pdf)
 Our source code is inspired by:
 - [pymoo: Multi-objective Optimization in Python](https://github.com/anyoptimization/pymoo)
 - [NSGA-Net: Neural Architecture Search using Multi-Objective Genetic Algorithm](https://github.com/ianwhale/nsga-net)
+
+## Citation
+If you use our source code, please cite our work as:
+``` 
+N.H. Luong, Q.M. Phan, A. Vo et al., Lightweight multi-objective evolutionary neural architecture search with low-cost proxy metrics,
+Information Sciences, https://doi.org/10.1016/j.ins.2023.119856
+```
